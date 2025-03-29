@@ -25,12 +25,29 @@ def login_view(request):
             return redirect('dashboard')  
     return render(request, 'login.html')
 
+# def sample(request):
+#     render(request, 'sample.html', {})
+
+
 def home(request):  
-    return render(request, 'users/home.html')
+    return render(request, 'users/home.html',{})
 
 
+from django.template.loader import get_template
+from django.http import HttpResponse
+
+def template_test(request):
+    try:
+        template = get_template('users/home.html')
+        return HttpResponse("Template found!")
+    except:
+        return HttpResponse("Template NOT found", status=500)
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def dashboard(request):
-    return render(request, 'dashboard.html')  
+    return render(request, 'users/dashboard.html')
 
 from django.shortcuts import render
 from .models import Document

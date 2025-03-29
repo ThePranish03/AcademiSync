@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
 from pathlib import Path
 import os
 
@@ -58,7 +57,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'users','templates')],  
+        'DIRS': [os.path.join(BASE_DIR, 'users','templates')],  # Ensure this points to your templates directory
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -66,7 +65,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',  # Add this line to include media context processor
             ],
+            'debug': True,  
         },
     },
 ]
@@ -125,6 +126,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Ensures static files from 'static/' directory are used
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Collects static files here
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -140,7 +145,8 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Collects static files here
 
-import os
+# Media files settings
+MEDIA_URL = '/media/'
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -159,6 +165,4 @@ CLOUDINARY_STORAGE = {
 
 # Set Cloudinary as the default storage
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-
-
 

@@ -1,3 +1,8 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Home Page Template for AcademiSync -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,20 +105,25 @@
     </style>
 </head>
 <body>
-
+    {% block content %}
     <!-- Navbar -->
     <div class="navbar">
-        <a href="{% url 'register' %}">Register</a>
-        <a href="{% url 'login' %}">Login</a>
+        <a href="/users/template/register.html">Register</a>
+        <a href="/users/template/login.html">Login</a>
     </div>
-
+    
+        {% endblock %}
+    {% block content %}
     <!-- Hero Section -->
     <div class="hero">
         <h1>Welcome to AcademiSync!</h1>
         <p>A complete learning management system for students, trainers, and administrators.</p>
-        <a href="{% url 'register' %}" class="btn">Get Started</a>
-        <a href="{% url 'login' %}" class="btn">Login</a>
+        <a href="/users/template/register.html" class="btn">Get Started</a>
+        <a href="/users/template/login.html" class="btn">Login</a>
     </div>
+    
+        {% endblock %}
+        {% block content %}
 
     <!-- Features Section -->
     <div class="features">
@@ -126,11 +136,15 @@
             <li><strong>Interactive Learning:</strong> Engage with quizzes, reports, and analytics.</li>
         </ul>
     </div>
+    
+            {% endblock %}
+        {% block content %}
 
     <!-- Footer -->
     <div class="footer">
         &copy; 2025 AcademiSync. All rights reserved.
     </div>
+            {% endblock %}
 
 </body>
 </html>
