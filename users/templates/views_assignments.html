@@ -1,0 +1,13 @@
+<h2>Submitted Assignments</h2>
+<ul>
+    {% for assignment in assignments %}
+        <li>
+            <a href="{{ assignment.file.url }}">{{ assignment.student.username }}</a> - Submitted on {{ assignment.submitted_at }}
+            {% if assignment.grade %}
+                <strong>Grade: {{ assignment.grade }}</strong> ({{ assignment.feedback }})
+            {% else %}
+                <a href="{% url 'grade_assignment' assignment.id %}">Grade</a>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

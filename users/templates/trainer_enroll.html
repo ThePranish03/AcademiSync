@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Trainer Enrollment</title>
+</head>
+<body>
+    <h1>Enter Your Class Code</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="class_code" required>
+        <button type="submit">Enroll</button>
+    </form>
+</body>
+</html>

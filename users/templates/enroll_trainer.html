@@ -1,0 +1,6 @@
+<form method="post">
+    {% csrf_token %}
+    <label for="trainer_code">Enter Trainer Code:</label>
+    <input type="text" name="trainer_code" required>
+    <button type="submit">Enroll</button>
+</form>

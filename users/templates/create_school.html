@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Create School</title>
+</head>
+<body>
+    <h1>Create Your School</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label>College Code:</label>
+        <input type="text" name="college_code" required><br>
+        
+        <label>College Name:</label>
+        <input type="text" name="college_name" required><br>
+
+        <label>Number of Classes (Max: 60):</label>
+        <input type="number" name="num_classes" min="1" max="60" required><br>
+
+        <button type="submit">Create School</button>
+    </form>
+</body>
+</html>

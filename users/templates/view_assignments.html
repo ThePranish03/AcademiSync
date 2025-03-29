@@ -1,0 +1,6 @@
+<h2>Submitted Assignments</h2>
+<ul>
+    {% for assignment in assignments %}
+        <li><a href="{{ assignment.file.url }}">{{ assignment.student.username }}</a> - Submitted on {{ assignment.submitted_at }}</li>
+    {% endfor %}
+</ul>
