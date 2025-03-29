@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from .forms import CustomUserCreationForm
+from .forms import StudyMaterialForm, AssignmentForm
 
 def register(request):
     if request.method == 'POST':
@@ -49,17 +50,3 @@ from django.contrib.auth.decorators import login_required
 def dashboard(request):
     return render(request, 'users/dashboard.html')
 
-from django.shortcuts import render
-from .models import Document
-from .forms import DocumentForm
-
-def upload_file(request):
-    if request.method == "POST":
-        form = DocumentForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()  # Saves to Cloudinary
-    else:
-        form = DocumentForm()
-    
-    documents = Document.objects.all()  # Get all uploaded files
-    return render(request, "upload.html", {"form": form, "documents": documents})

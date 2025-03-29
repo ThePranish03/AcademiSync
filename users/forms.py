@@ -9,12 +9,3 @@ class CustomUserCreationForm(UserCreationForm):
         model = CustomUser
         fields = ['username', 'email', 'role', 'school', 'resume', 'password1', 'password2']
 
-from django import forms
-from .models import Document
-
-class DocumentForm(forms.ModelForm):
-    class Meta:
-        model = Document
-        fields = ["title", "file"]
-
-
