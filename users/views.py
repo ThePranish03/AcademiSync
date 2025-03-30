@@ -174,12 +174,18 @@ def view_schools(request):
 # Trainer Enrollment
 def trainer_enroll(request):
     if request.method == "POST":
+        print("POST Data:", request.POST)
         entered_code = request.POST["class_code"]
         batch = Batch.objects.filter(teacher_code=entered_code).first()
+
+        if not entered_code:
+            messages.error(request, "Class code is required.")
+            return redirect("trainer_enroll")
         if batch:
             return render(request, "upload_materials.html", {"batch": batch})
         else:
-            return HttpResponse("Invalid class code!")
+            messages.error(request,"Invalid class code!")
+            return render (request, "trainer_enroll.html")
 
     return render(request, "trainer_enroll.html")
 
@@ -191,7 +197,8 @@ def student_enroll(request):
         if batch:
             return render(request,"view_assignments.html",{"batch":batch})
         else:
-            return HttpResponse("Invalid class code!")
+            messages.error(request,"Invalid class code!")
+            return redirect("student_enroll")
 
     return render(request, "student_enroll.html")
 
@@ -235,9 +242,8 @@ from .forms import StudyMaterialForm, AssignmentForm,GradeAssignmentForm
 from .forms import SchoolForm
 import uuid
 
-@login_required
 def upload_materials(request):
-    trainer_batch = Batch.objects.filter(trainer=request.user).first()  
+    trainer_batch = Batch.objects.filter(trainer=request.user).first()
     if not trainer_batch:
         messages.error(request, "You are not assigned to any batch.")
         return redirect('dashboard')
@@ -246,6 +252,9 @@ def upload_materials(request):
     assignments = Assignment.objects.filter(batch=trainer_batch)
 
     if request.method == "POST":
+        print("POST Data:", request.POST)
+        print("FILES Data:", request.FILES)
+
         if "submit_study" in request.POST:
             study_form = StudyMaterialForm(request.POST, request.FILES)
             if study_form.is_valid():
@@ -254,6 +263,8 @@ def upload_materials(request):
                 study_material.save()
                 messages.success(request, "Study material uploaded successfully!")
                 return redirect('upload_materials')
+            else:
+                print("Study Form Errors:", study_form.errors)
 
         elif "submit_assignment" in request.POST:
             assignment_form = AssignmentForm(request.POST, request.FILES)
@@ -263,6 +274,8 @@ def upload_materials(request):
                 assignment.save()
                 messages.success(request, "Assignment uploaded successfully!")
                 return redirect('upload_materials')
+            else:
+                print("Assignment Form Errors:", assignment_form.errors)
 
     else:
         study_form = StudyMaterialForm()
@@ -274,6 +287,7 @@ def upload_materials(request):
         "study_materials": study_materials,
         "assignments": assignments
     })
+
 
 
 @login_required

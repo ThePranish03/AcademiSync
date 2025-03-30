@@ -153,6 +153,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Collects static files her
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 import cloudinary
 import cloudinary.uploader
