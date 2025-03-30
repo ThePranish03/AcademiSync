@@ -1,11 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Admin Dashboard</title>
-</head>
-<body>
-    <h1>Admin Options</h1>
-    <a href="{% url 'create_school' %}"><button>I don't have a school</button></a>
-    <a href="{% url 'view_schools' %}"><button>I already have a school</button></a>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-gray-800 text-white p-6 rounded-lg shadow-lg mt-10">
+    <h1 class="text-3xl font-bold text-center text-blue-400 mb-6">Admin Dashboard</h1>
+
+    <p class="text-lg text-center mb-4">Welcome, <span class="font-semibold">{{ request.user.username }}</span>!</p>
+
+    <div class="flex flex-col space-y-4">
+        <a href="{% url 'create_school' %}" class="text-center">
+            <button class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition">
+                I don't have a school
+            </button>
+        </a>
+        
+        <a href="{% url 'view_schools' %}" class="text-center">
+            <button class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg transition">
+               My school
+            </button>
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,22 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Create Your School</h1>
-    <form method="post">
-        {% csrf_token %}
-        <label>College Code:</label>
-        <input type="text" name="college_code" required><br>
-        
-        <label>College Name:</label>
-        <input type="text" name="college_name" required><br>
-
-        <label>Number of Classes (Max: 60):</label>
-        <input type="number" name="num_classes" min="1" max="60" required><br>
-
-        <button type="submit">Create School</button>
-    </form>
+<body class="bg-gray-900 text-white flex justify-center items-center min-h-screen">
+    <div class="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-bold text-blue-400 mb-6 text-center">Create Your School</h1>
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            
+            <div>
+                <label class="block text-gray-300 mb-1">College Code:</label>
+                <input type="text" name="college_code" required
+                    class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:border-blue-400">
+            </div>
+            
+            <div>
+                <label class="block text-gray-300 mb-1">College Name:</label>
+                <input type="text" name="college_name" required
+                    class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:border-blue-400">
+            </div>
+            
+            <div>
+                <label class="block text-gray-300 mb-1">Number of Classes (Max: 60):</label>
+                <input type="number" name="num_classes" min="1" max="60" required
+                    class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:border-blue-400">
+            </div>
+            
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition">
+                Create School
+            </button>
+        </form>
+    </div>
 </body>
 </html>

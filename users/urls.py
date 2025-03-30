@@ -1,7 +1,9 @@
 from django.urls import path
 from . import views
-from .views import upload_study_material, view_study_materials, submit_assignment, view_assignments
+from .views import   submit_assignment, view_assignments
 from .views import grade_assignment, enroll_trainer, enroll_student
+from .views import upload_materials, view_study_materials, submit_assignment, view_assignments
+
 
 urlpatterns = [
     path("", views.home, name="home"),  # Home Page
@@ -13,11 +15,10 @@ urlpatterns = [
     path("student-enroll/", views.student_enroll, name="student_enroll"),  # Student Enrollment
     path("enroll-trainer/", views.enroll_trainer, name="enroll_trainer"),
     path("enroll-student/", views.enroll_student, name="enroll_student"),
-    path("upload-study-material/", upload_study_material, name="upload_study_material"),
-    path("view-study-materials/", view_study_materials, name="view_study_materials"),
-    path("submit-assignment/", submit_assignment, name="submit_assignment"),
-    path("view-assignments/", view_assignments, name="view_assignments"),
-    path("grade-assignment/<int:assignment_id>/", views.grade_assignment, name="grade_assignment"),
+    path("upload-material/", upload_materials, name="upload_material"),
+    path("submit_assignment/", submit_assignment, name="submit_assignment"),
+    path("view_assignments/", view_assignments, name="view_assignments"),
+    path("grade_assignment/<int:assignment_id>/", views.grade_assignment, name="grade_assignment"),
     path("admin_login/", views.admin_login, name="admin_login"),
-    path("admin_signup/", views.admin_signup, name="admin_logout"),
+    path("admin_signup/", views.admin_signup, name="admin_signup"),
 ]

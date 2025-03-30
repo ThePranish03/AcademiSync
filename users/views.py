@@ -6,6 +6,8 @@ from .models import School, Batch, Trainer, Student
 from django.db import IntegrityError
 from django.shortcuts import render
 from .models import Batch
+from django.contrib.auth import get_user_model
+
 
 # Home Page
 def home(request):
@@ -44,46 +46,55 @@ from django.contrib.auth.forms import AuthenticationForm
 
 def admin_login(request):
     if request.method == "POST":
-        form = AuthenticationForm(data=request.POST)
+        form = AuthenticationForm(request, data=request.POST)  # Ensure request is passed
+
         if form.is_valid():
             user = form.get_user()
-            if user.is_staff:  # Only allow staff (admins)
+            
+            if user.is_staff:  # Check if the user is an admin
                 login(request, user)
-                return redirect("admin_dashboard")
+                messages.success(request, f"Welcome, {user.username}! Login successful!")
+                return redirect("admin_dashboard")  # Redirect to the admin dashboard
+            
             else:
                 messages.error(request, "Only admins can log in here.")
+        
         else:
             messages.error(request, "Invalid credentials!")
 
     else:
         form = AuthenticationForm()
-    
+
     return render(request, "admin_login.html", {"form": form})
 
 from django.contrib.auth.models import User
 from django.core.mail import send_mail  # Optional for email notifications
 
+CustomUser = get_user_model()  # Get the custom user model
+
 def admin_signup(request):
     if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
-        email = request.POST["email"]
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
 
-        user = User.objects.create_user(username=username, password=password, email=email)
-        user.is_staff = False  # New admins need approval
+        # Check if the username already exists
+        if CustomUser.objects.filter(username=username).exists():
+            messages.error(request, "Username already taken. Please choose another one.")
+            return redirect("admin_signup")
+
+        # Check if the email is already used
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, "Email already registered. Try logging in.")
+            return redirect("admin_signup")
+
+        # Create the user
+        user = CustomUser.objects.create_user(username=username, email=email, password=password)
+        user.is_admin = True  # If you have an admin flag
         user.save()
 
-        # Notify existing admins (optional)
-        send_mail(
-            "New Admin Request",
-            f"A new admin {username} has registered. Approve them in the admin panel.",
-            "your-email@example.com",
-            ["admin@example.com"],  # Replace with actual admin emails
-            fail_silently=True,
-        )
-
-        messages.success(request, "Admin sign-up request sent. Wait for approval.")
-        return redirect("home")
+        messages.success(request, "Admin account created successfully! You can now log in.")
+        return redirect("admin_login")  # Redirect to login page
 
     return render(request, "admin_signup.html")
 
@@ -96,30 +107,69 @@ def admin_dashboard(request):
     
     return render(request, "admin_dashboard.html")
 
-import uuid
-def generate_unique_batch_code():
-    return str(uuid.uuid4())[:8]
+def generate_unique_code(model, field_name):
+    while True:
+        unique_code = str(uuid.uuid4().hex[:8])
+        if not model.objects.filter(**{field_name: unique_code}).exists():
+            return unique_code
 
 def create_school(request):
     if request.method == "POST":
-        batch_code = generate_unique_batch_code()
+        form = SchoolForm(request.POST)
+        if form.is_valid():
+            school = form.save()  # ✅ Save school first
 
-        # Ensure uniqueness by regenerating if code already exists
-        while Batch.objects.filter(code=batch_code).exists():
-            batch_code = generate_unique_batch_code()
+            num_classes = school.num_classes
+            for i in range(1, num_classes + 1):
+                Batch.objects.create(
+                    school=school,
+                    class_name=f"Class {i}",
+                    name=f"Batch {i}",
+                    teacher_code=str(uuid.uuid4())[:8],  # ✅ Generate unique trainer code
+                    student_code=str(uuid.uuid4())[:8],  # ✅ Generate unique student code
+                    code=str(uuid.uuid4())[:8],  # ✅ Ensure batch code is unique
+                    class_number=i
+                )
 
-        batch = Batch(code=batch_code)  
-        batch.save()
+            messages.success(request, "School and batches created successfully!")
+            return redirect("admin_dashboard")
+        else:
+            messages.error(request, "Invalid data provided!")
 
-        return render(request, "success.html", {"message": f"School created! Batch Code: {batch_code}"})
+    else:
+        form = SchoolForm()
 
-    return render(request, "create_school.html") 
+    return render(request, "create_school.html", {"form": form})
 
-# View Existing Schools
 def view_schools(request):
     schools = School.objects.all()
     batches = Batch.objects.all()
-    return render(request, "view_schools.html", {"schools": schools, "batches": batches})
+
+    school_data = []
+
+    for school in schools:
+        related_batches = batches.filter(school=school)
+
+        batch_details = [
+            {
+                "batch_name": batch.name,  # ✅ Use 'name' instead of 'batch_name'
+                "class_name": batch.class_name,  # ✅ Correct field
+                "teacher_code": batch.teacher_code,
+                "student_code": batch.student_code,
+                "class_number": batch.class_number,
+            }
+            for batch in related_batches
+        ]
+
+        school_data.append({
+            "school_name": school.college_name,
+            "college_code": school.college_code,
+            "num_classes": school.num_classes,
+            "batches": batch_details,
+        })
+
+    return render(request, "view_schools.html", {"school_data": school_data})
+
 
 # Trainer Enrollment
 def trainer_enroll(request):
@@ -127,7 +177,7 @@ def trainer_enroll(request):
         entered_code = request.POST["class_code"]
         batch = Batch.objects.filter(teacher_code=entered_code).first()
         if batch:
-            return HttpResponse("Trainer enrolled successfully!")
+            return render(request, "upload_materials.html", {"batch": batch})
         else:
             return HttpResponse("Invalid class code!")
 
@@ -139,7 +189,7 @@ def student_enroll(request):
         entered_code = request.POST["class_code"]
         batch = Batch.objects.filter(student_code=entered_code).first()
         if batch:
-            return HttpResponse("Student enrolled successfully!")
+            return render(request,"view_assignments.html",{"batch":batch})
         else:
             return HttpResponse("Invalid class code!")
 
@@ -182,26 +232,49 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import StudyMaterial, Assignment, Trainer, Student, Batch
 from .forms import StudyMaterialForm, AssignmentForm,GradeAssignmentForm
+from .forms import SchoolForm
+import uuid
 
 @login_required
-def upload_study_material(request):
-    trainer = Trainer.objects.filter(user=request.user).first()
-    if not trainer or not trainer.batch:
-        messages.error(request, "You must be enrolled as a trainer to upload materials!")
-        return redirect("trainer_dashboard")
-    
+def upload_materials(request):
+    trainer_batch = Batch.objects.filter(trainer=request.user).first()  
+    if not trainer_batch:
+        messages.error(request, "You are not assigned to any batch.")
+        return redirect('dashboard')
+
+    study_materials = StudyMaterial.objects.filter(batch=trainer_batch)
+    assignments = Assignment.objects.filter(batch=trainer_batch)
+
     if request.method == "POST":
-        form = StudyMaterialForm(request.POST, request.FILES)
-        if form.is_valid():
-            material = form.save(commit=False)
-            material.batch = trainer.batch
-            material.save()
-            messages.success(request, "Study material uploaded successfully!")
-            return redirect("trainer_dashboard")
+        if "submit_study" in request.POST:
+            study_form = StudyMaterialForm(request.POST, request.FILES)
+            if study_form.is_valid():
+                study_material = study_form.save(commit=False)
+                study_material.batch = trainer_batch
+                study_material.save()
+                messages.success(request, "Study material uploaded successfully!")
+                return redirect('upload_materials')
+
+        elif "submit_assignment" in request.POST:
+            assignment_form = AssignmentForm(request.POST, request.FILES)
+            if assignment_form.is_valid():
+                assignment = assignment_form.save(commit=False)
+                assignment.batch = trainer_batch
+                assignment.save()
+                messages.success(request, "Assignment uploaded successfully!")
+                return redirect('upload_materials')
+
     else:
-        form = StudyMaterialForm()
-    
-    return render(request, "upload_study_material.html", {"form": form})
+        study_form = StudyMaterialForm()
+        assignment_form = AssignmentForm()
+
+    return render(request, "upload_materials.html", {
+        "study_form": study_form,
+        "assignment_form": assignment_form,
+        "study_materials": study_materials,
+        "assignments": assignments
+    })
+
 
 @login_required
 def view_study_materials(request):
@@ -236,13 +309,27 @@ def submit_assignment(request):
 
 @login_required
 def view_assignments(request):
-    trainer = Trainer.objects.filter(user=request.user).first()
-    if not trainer or not trainer.batch:
-        messages.error(request, "You must be enrolled as a trainer to view assignments!")
-        return redirect("trainer_dashboard")
+    user = request.user
     
-    assignments = Assignment.objects.filter(batch=trainer.batch)
-    return render(request, "view_assignments.html", {"assignments": assignments})
+    # Check if user is a student or trainer
+    if hasattr(user, 'student'):
+        batch = user.student.batch  # Student's batch
+    elif hasattr(user, 'trainer'):
+        batch = user.trainer.batch  # Trainer's batch
+    else:
+        batch = None
+
+    if batch:
+        assignments = Assignment.objects.filter(batch=batch)
+        study_materials = StudyMaterial.objects.filter(batch=batch)
+    else:
+        assignments = []
+        study_materials = []
+
+    return render(request, "view_assignment.html", {
+        "assignments": assignments,
+        "study_materials": study_materials
+    })
 
 @login_required
 def grade_assignment(request, assignment_id):

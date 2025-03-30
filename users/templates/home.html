@@ -1,12 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Home</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AcademiSync - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Welcome to AcademiSync</h1>
-    <a href="{% url 'select_role' %}">
-        <button>Get Started</button>
-    </a>
+<body class="bg-gray-900 flex items-center justify-center h-screen">
+
+    <div class="max-w-3xl bg-gray-800 p-8 shadow-lg rounded-lg text-center">
+        <h1 class="text-4xl font-bold text-blue-400 mb-4">Welcome to AcademiSync</h1>
+        <p class="text-gray-300 mb-6">
+            AcademiSync is your one-stop platform for seamless academic collaboration.  
+            Designed for <span class="font-semibold">students, trainers, and administrators</span>, we simplify learning  
+            by offering structured study materials, assignments, and batch-based education.
+        </p>
+
+        <a href="{% url 'select_role' %}">
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-lg shadow-md transition">
+                Get Started 🚀
+            </button>
+        </a>
+    </div>
+
 </body>
 </html>

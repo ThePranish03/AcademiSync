@@ -33,17 +33,19 @@ class Batch(models.Model):
     class_name = models.CharField(max_length=100)
     teacher_code = models.CharField(max_length=10, unique=True, editable=False)
     student_code = models.CharField(max_length=10, unique=True, editable=False)
-    class_number = models.IntegerField(default=1)  # Ensure this field exists
+    class_number = models.IntegerField(default=1)
     name = models.CharField(max_length=255)
-    code = models.CharField(max_length=10, unique=True)
-    class Meta:
-        verbose_name_plural = "batches"
+    code = models.CharField(max_length=10, unique=True, editable=False)  # ✅ Unique batch code
 
     def save(self, *args, **kwargs):
+        # ✅ Generate unique codes if they don't exist
         if not self.teacher_code:
-            self.teacher_code = str(uuid.uuid4())[:8]  # Unique 8-char code
+            self.teacher_code = str(uuid.uuid4())[:8]  # 8-character trainer code
         if not self.student_code:
-            self.student_code = str(uuid.uuid4())[:8]  # Unique 8-char code
+            self.student_code = str(uuid.uuid4())[:8]  # 8-character student code
+        if not self.code:
+            self.code = str(uuid.uuid4())[:8]  # ✅ Unique batch code
+        
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -77,23 +79,17 @@ class Student(models.Model):
         return self.user.username
 
 class StudyMaterial(models.Model):
+    title = models.CharField(max_length=255)
+    file = models.FileField(upload_to='study_materials/')
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    file = models.FileField(upload_to="study_materials/")
-
-    def __str__(self):
-        return self.title
 
 class Assignment(models.Model):
+    title = models.CharField(max_length=255)
+    file = models.FileField(upload_to='assignments/')
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
-    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    file = models.FileField(upload_to="assignments/")
-    submitted_at = models.DateTimeField(auto_now_add=True)
-    grade = models.IntegerField(null=True, blank=True)  # or models.CharField()
-    feedback = models.TextField(null=True, blank=True)
+    grade = models.CharField(max_length=10, blank=True, null=True)  # New field
+    feedback = models.TextField(blank=True, null=True)  # New field
 
-    def __str__(self):
-        return f"Assignment by {self.student.username} for {self.batch.name}"
 
 class AssignmentSubmission(models.Model):
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)

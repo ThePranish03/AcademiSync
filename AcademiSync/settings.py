@@ -150,7 +150,10 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Collects static files here
 
 # Media files settings
-MEDIA_URL = '/media/'
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api

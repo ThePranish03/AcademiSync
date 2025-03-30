@@ -1,38 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>View Schools & Login</title>
-</head>
-<body>
-    <h1>Existing Schools</h1>
-    <ul>
-        {% for school in schools %}
-            <li>
-                <strong>{{ school.name }}</strong> ({{ school.college_code }})
-            </li>
-        {% endfor %}
-    </ul>
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-3xl mx-auto bg-gray-800 text-white p-6 rounded-lg shadow-lg mt-10">
+    <h1 class="text-3xl font-bold text-blue-400 mb-6 text-center">Existing Schools</h1>
 
-    <!-- <h2>Get Your Class Code</h2>
-    <form method="POST" action="{% url 'trainer_enroll' %}">
-        {% csrf_token %}
-        <label for="trainer_code">Trainer Code:</label>
-        <input type="text" name="class_code" required>
-        <button type="submit">Login as Trainer</button>
-    </form>
+    {% if school_data %}
+        <div class="space-y-6">
+            {% for school in school_data %}
+                <div class="bg-gray-700 p-4 rounded-lg shadow">
+                    <h2 class="text-xl font-semibold text-yellow-400">{{ school.school_name }}</h2>
+                    <p class="text-gray-300">College Code: <span class="font-bold">{{ school.college_code }}</span></p>
+                    <p class="text-gray-300">Total Classes: <span class="font-bold">{{ school.num_classes }}</span></p>
 
-    <form method="POST" action="{% url 'student_enroll' %}">
-        {% csrf_token %}
-        <label for="student_code">Student Code:</label>
-        <input type="text" name="class_code" required>
-        <button type="submit">Login as Student</button>
-    </form> -->
+                    {% if school.batches %}
+                        <h3 class="text-lg font-semibold text-green-400 mt-4">Batches:</h3>
+                        <ul class="mt-2 space-y-2">
+                            {% for batch in school.batches %}
+                                <li class="bg-gray-600 p-3 rounded">
+                                    <p>Batch: <span class="font-bold">{{ batch.batch_name }}</span></p>
+                                    <p>Trainer Code: <span class="text-blue-400">{{ batch.trainer_code }}</span></p>
+                                    <p>Student Code: <span class="text-green-400">{{ batch.student_code }}</span></p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-red-400">No batches available for this school.</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-red-400 text-center mt-4">No schools have been created yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
 
-    <h2>Available Batch Codes</h2>
-    <ul>
-        {% for batch in batches %}
-            <li>Trainer Code: {{ batch.trainer_code }} | Student Code: {{ batch.student_code }}</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>

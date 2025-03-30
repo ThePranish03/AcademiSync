@@ -1,6 +1,72 @@
-<h2>Submitted Assignments</h2>
-<ul>
-    {% for assignment in assignments %}
-        <li><a href="{{ assignment.file.url }}">{{ assignment.student.username }}</a> - Submitted on {{ assignment.submitted_at }}</li>
-    {% endfor %}
-</ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignments & Study Materials</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
+
+    <div class="max-w-3xl bg-gray-800 p-8 shadow-lg rounded-lg text-center">
+        <h1 class="text-3xl font-bold mb-6">Your Class Resources</h1>
+
+        <div class="flex justify-center gap-4">
+            <!-- Assignments Button -->
+            <button id="assignmentsBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg">
+                View Assignments 📄
+            </button>
+            
+            <!-- Study Materials Button -->
+            <button id="materialsBtn" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg">
+                View Study Materials 📚
+            </button>
+        </div>
+
+        <!-- Assignments List -->
+        <div id="assignmentsSection" class="mt-6 hidden">
+            <h2 class="text-xl font-semibold mb-4">Assignments</h2>
+            <ul class="text-left">
+                {% for assignment in assignments %}
+                    <li class="mb-2">
+                        <a href="{{ assignment.file.url }}" class="text-blue-400 hover:underline">
+                            {{ assignment.student.username }}
+                        </a> - Submitted on {{ assignment.submitted_at }} - Path: {{ assignment.file.path }}
+                    </li>
+                {% empty %}
+                    <p>No assignments submitted yet.</p>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Study Materials List -->
+        <div id="materialsSection" class="mt-6 hidden">
+            <h2 class="text-xl font-semibold mb-4">Study Materials</h2>
+            <ul class="text-left">
+                {% for material in study_materials %}
+                    <li class="mb-2">
+                        <a href="{{ material.file.url }}" class="text-green-400 hover:underline">
+                            {{ material.title }}
+                        </a> - Uploaded on {{ material.uploaded_at }} - Path: {{ material.file.path }}
+                    </li>
+                {% empty %}
+                    <p>No study materials available yet.</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("assignmentsBtn").addEventListener("click", function() {
+            document.getElementById("assignmentsSection").classList.toggle("hidden");
+            document.getElementById("materialsSection").classList.add("hidden");
+        });
+
+        document.getElementById("materialsBtn").addEventListener("click", function() {
+            document.getElementById("materialsSection").classList.toggle("hidden");
+            document.getElementById("assignmentsSection").classList.add("hidden");
+        });
+    </script>
+
+</body>
+</html>

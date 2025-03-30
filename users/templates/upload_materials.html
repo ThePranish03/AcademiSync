@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-3xl mx-auto bg-gray-900 text-white p-6 rounded-lg shadow-lg mt-10">
+    <h1 class="text-3xl font-bold text-blue-400 mb-6 text-center">Upload Materials</h1>
+
+    {% if messages %}
+        <ul class="mb-4">
+            {% for message in messages %}
+                <li class="text-center text-{{ message.tags }}-400">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Upload Study Material -->
+        <div class="bg-gray-800 p-4 rounded-lg">
+            <h2 class="text-xl font-semibold text-yellow-400 mb-4">Upload Study Material (PDF)</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="study_material" accept="application/pdf" required class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
+                <button type="submit" name="submit_study" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg mt-2 w-full">
+                    Upload Study Material
+                </button>
+            </form>
+        </div>
+
+        <!-- Upload Assignment -->
+        <div class="bg-gray-800 p-4 rounded-lg">
+            <h2 class="text-xl font-semibold text-green-400 mb-4">Upload Assignment (PDF)</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="assignment" accept="application/pdf" required class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-700" />
+                <button type="submit" name="submit_assignment" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg mt-2 w-full">
+                    Upload Assignment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Display Study Materials -->
+    <h2 class="text-2xl font-semibold text-yellow-400 mt-8">Available Study Materials</h2>
+    <ul class="bg-gray-800 p-4 rounded-lg mt-2">
+        {% for material in study_materials %}
+            <li class="mb-2">
+                <a href="{{ material.file.url }}" target="_blank" class="text-blue-400 hover:underline">
+                    {{ material.title }}
+                </a>
+            </li>
+        {% empty %}
+            <li class="text-gray-400">No study materials available.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Display Assignments -->
+    <h2 class="text-2xl font-semibold text-green-400 mt-8">Available Assignments</h2>
+    <ul class="bg-gray-800 p-4 rounded-lg mt-2">
+        {% for assignment in assignments %}
+            <li class="mb-2">
+                <a href="{{ assignment.file.url }}" target="_blank" class="text-green-400 hover:underline">
+                    {{ assignment.title }}
+                </a>
+            </li>
+        {% empty %}
+            <li class="text-gray-400">No assignments available.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
